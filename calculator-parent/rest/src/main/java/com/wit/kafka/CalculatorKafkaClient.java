@@ -1,17 +1,14 @@
 package com.wit.kafka;
 
-
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
-import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
 
-import com.wit.common.Constants;
 import com.wit.common.dto.CalculatorRequest;
 import com.wit.common.dto.CalculatorResponse;
+import com.wit.config.RequestIdFilter;
 
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class CalculatorKafkaClient {
@@ -23,15 +20,22 @@ public class CalculatorKafkaClient {
         this.template = template;
     }
 
-    public CalculatorResponse sendAndReceive(CalculatorRequest request) throws Exception {
+    public CalculatorResponse sendAndReceive(CalculatorRequest calculatorRequest)
+            throws InterruptedException, ExecutionException {
 
         ProducerRecord<String, CalculatorRequest> record =
-                new ProducerRecord<>(Constants.REQUEST_TOPIC, request);
+                new ProducerRecord<>("calculator-requests", calculatorRequest);
 
-        RequestReplyFuture<String, CalculatorRequest, CalculatorResponse> future =
-                template.sendAndReceive(record);
+        // ✅ Usa SEMPRE o requestId que veio do controller
+        record.headers().add(
+                RequestIdFilter.REQUEST_ID_HEADER,
+                calculatorRequest.getRequestId().getBytes()
+        );
 
-        return future.get(5, TimeUnit.SECONDS).value();
+        var future = template.sendAndReceive(record);
+        var consumerRecord = future.get();
+
+        return consumerRecord.value();
     }
 }
 

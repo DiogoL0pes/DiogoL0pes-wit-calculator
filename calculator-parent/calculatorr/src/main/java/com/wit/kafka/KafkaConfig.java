@@ -21,7 +21,7 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
 
-    // ---------- CONSUMER (requests) ----------
+
     @Bean
     public ConsumerFactory<String, CalculatorRequest> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -38,7 +38,6 @@ public class KafkaConfig {
         );
     }
 
-    // ---------- PRODUCER (replies) ----------
     @Bean
     public ProducerFactory<String, CalculatorResponse> producerFactory() {
         Map<String, Object> props = new HashMap<>();
