@@ -157,12 +157,6 @@ Run As → Maven test
 
 Kafka is **not required** to be running in order to execute unit tests.
 
----
-## Running Unit Tests
-Extra, after the 1st implementation (7-8hrs)
-I used 2 extra Hrs for UUID implementation+tests on this matter
 
 
-## Author
 
-Developed as part of a technical assessment for WIT.
